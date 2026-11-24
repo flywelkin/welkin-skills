@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "d5fbb56e-6a1e-4744-b8b3-7153dd0278a9",
+  "path": "ponytail",
+  "path_key": "ponytail",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "skillssh",
+    "ref": "dietrichgebert/ponytail/ponytail",
+    "subpath": "skills\\ponytail",
+    "branch": null
+  }
+}
