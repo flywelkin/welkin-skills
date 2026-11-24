@@ -5,7 +5,7 @@
   "sort_order": 0,
   "tools": {
     "claude_code": false,
-    "codex": false,
+    "codex": true,
     "github_copilot": false,
     "opencode": true,
     "pi": false,
