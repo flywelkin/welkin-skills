@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "96b604b0-d9df-4588-9c58-e7bd32b86eb2",
+  "path": "openspec-propose-2",
+  "path_key": "openspec-propose-2",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://github.com/studyzy/OpenSpec-cn.git",
+    "subpath": "skills\\openspec-propose",
+    "branch": null
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "ad52c7b7-1296-44e3-ad8d-1ebc57c93dee",
+  "path": "openspec-verify-change-2",
+  "path_key": "openspec-verify-change-2",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://github.com/studyzy/OpenSpec-cn.git",
+    "subpath": "skills\\openspec-verify-change",
+    "branch": null
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "c42b7ae9-7ce8-495c-92e3-b7ca216269fc",
+  "path": "openspec-bulk-archive-change-2",
+  "path_key": "openspec-bulk-archive-change-2",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://github.com/studyzy/OpenSpec-cn.git",
+    "subpath": "skills\\openspec-bulk-archive-change",
+    "branch": null
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "b6f32c0e-0b0a-4fde-899b-caacf5be22ec",
+  "path": "openspec-archive-change-2",
+  "path_key": "openspec-archive-change-2",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://github.com/studyzy/OpenSpec-cn.git",
+    "subpath": "skills\\openspec-archive-change",
+    "branch": null
+  }
+}

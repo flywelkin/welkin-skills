@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "22f18ba5-df45-4743-a821-6c3c4393bf44",
+  "path": "openspec-onboard-2",
+  "path_key": "openspec-onboard-2",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://github.com/studyzy/OpenSpec-cn.git",
+    "subpath": "skills\\openspec-onboard",
+    "branch": null
+  }
+}

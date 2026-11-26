@@ -4,9 +4,7 @@
   "path": "finishing-a-development-branch",
   "path_key": "finishing-a-development-branch",
   "enabled": true,
-  "tags": [
-    "superpowers"
-  ],
+  "tags": [],
   "source": {
     "type": "git",
     "ref": "https://github.com/obra/superpowers.git",

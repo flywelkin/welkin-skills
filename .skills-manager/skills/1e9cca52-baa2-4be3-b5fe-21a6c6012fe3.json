@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "1e9cca52-baa2-4be3-b5fe-21a6c6012fe3",
+  "path": "openspec-update-change-2",
+  "path_key": "openspec-update-change-2",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://github.com/studyzy/OpenSpec-cn.git",
+    "subpath": "skills\\openspec-update-change",
+    "branch": null
+  }
+}

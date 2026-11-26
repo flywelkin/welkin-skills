@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "a4469912-9bae-4af8-bee1-3d5be0aff715",
+  "path": "requesting-code-review-2",
+  "path_key": "requesting-code-review-2",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://github.com/jnMetaCode/superpowers-zh.git",
+    "subpath": "skills\\requesting-code-review",
+    "branch": null
+  }
+}

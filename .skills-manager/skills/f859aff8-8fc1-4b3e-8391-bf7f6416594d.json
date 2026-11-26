@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "f859aff8-8fc1-4b3e-8391-bf7f6416594d",
+  "path": "diagnosing-superpowers-2",
+  "path_key": "diagnosing-superpowers-2",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://github.com/jnMetaCode/superpowers-zh.git",
+    "subpath": "skills\\diagnosing-superpowers",
+    "branch": null
+  }
+}

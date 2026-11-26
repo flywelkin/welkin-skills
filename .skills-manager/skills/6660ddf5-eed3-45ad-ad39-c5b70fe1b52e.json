@@ -4,9 +4,7 @@
   "path": "verification-before-completion",
   "path_key": "verification-before-completion",
   "enabled": true,
-  "tags": [
-    "superpowers"
-  ],
+  "tags": [],
   "source": {
     "type": "git",
     "ref": "https://github.com/obra/superpowers.git",

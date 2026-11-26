@@ -1,0 +1,355 @@
+---
+name: openspec-bulk-archive-change
+description: 一次性归档多个已完成的变更。当需要归档多个并行变更时使用。也用于复数形式的归档请求 —— "openspec bulk-archive"、"opsx bulk-archive"、"openspec archive all" 或 "openspec archive these changes"。
+allowed-tools: Bash(openspec-cn:*)
+license: MIT
+compatibility: 需要 openspec-cn CLI。
+metadata:
+  author: openspec
+  version: "1.0"
+---
+
+在单次操作中归档多个已完成的变更。
+
+此技能允许您批量归档变更，通过检查代码库判断实际已实现的内容，从而智能处理 spec 冲突。
+
+**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`schemas`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
+
+**项目检查：** 以下步骤期望项目已经在使用 OpenSpec。在第一个会写入任何内容的步骤之前（`new change`、`archive`、`sync specs`，或撰写任何产出物文件），确认项目已有根目录：运行 `openspec-cn list --json`（当选择了 store 时加上 `--store <id>`，因为此时 store 就是根目录），并读取 `root`。root 是一个对象表示项目已配置好。`"root": null` 表示尚未配置 —— 这里没有 `openspec/` 目录，而像 `openspec-cn new change` 这样的写入操作会作为副作用创建它。该命令还会以非零状态退出，这是它给出的答案而不是 CLI 坏了，因此请读取 JSON，不要重试或绕过它。
+
+有一种 `"root": null` 与配置无关：当某条 `status` 错误消息以 `中声明` 或 `中的 store 声明无效` 结尾，并指向本项目的 `openspec/config.yaml`（或 `config.yml`）时，说明本项目确实通过它声明的某个 store 在使用 OpenSpec，只是本机无法解析该 store（store 未注册，或 `store:` 行格式有误）。不要把它当作未初始化而跳过下面的分支：请在写入前停下，把该错误的 `message` 和 `fix` 展示给用户。
+
+否则，在没有根目录的情况下，接下来怎么做取决于这个工作流是如何被触发的：
+
+- **自动选用**：这个工作流是你自己选的，用户没有提到 OpenSpec、没有点名这个 skill，也没有按名字调用这个 skill。停止使用 OpenSpec，按平常方式回答请求，就像没安装 OpenSpec 一样。不要要求他们做任何配置，也不要提及 OpenSpec 配置。
+- **明确要求 OpenSpec**：用户提到了 OpenSpec、点名了这个 skill，或按名字调用了这个 skill。在写入前停下并询问如何继续：为本项目做配置（`openspec-cn init`）、指向他们已有的某个 store（`--store <id>`），还是本次请求不使用 OpenSpec 继续。等待他们的答复。
+
+无论走哪个分支，都绝不能把创建根目录当作副作用：在用户要求之前不要运行 `openspec-cn init`，不要手工创建 `openspec/` 文件，也不要让任何命令创建它。
+
+`<capability-path>` 是相对于 `specs/` 的 spec 目录（例如 `user-auth` 或 `identity/user-auth`）。在解析主 spec 时保留每个增量 spec 的完整路径。
+
+**Input**: None required（通过提示选择）
+
+**步骤**
+
+1. **获取活跃变更**
+
+   运行 `openspec-cn list --json` 获取所有活跃变更。
+
+   若无活跃变更，告知用户并停止。
+
+2. **提示选择变更**
+
+   请用户选择变更（多选）：
+   - 展示列表输出中每个变更的名称和任务状态
+   - 包含"全部变更"选项
+   - 允许任意数量的选择（1+ 可以，2+ 是典型用例）
+
+   **重要提示**：切勿自动选择。始终由用户选择。
+
+   **在批量校验之前，为所选根目录一次性加载当前归档输入：**
+
+   从该根目录中选一个已选变更，运行
+   `openspec-cn instructions archive --change "<selected-change>" --json`，并带上
+   相同的已选根目录标志。该查询是建议性且可选的：它只是提供
+   额外的提示输入，因此绝不能阻塞批量操作。若它失败或返回
+   无效 JSON —— 例如在尚不支持此命令的旧版 CLI 上
+   —— 则在没有 context 与 operation guidance 的情况下继续批量操作。不要
+   报告错误，也不要停止。
+
+   有效的响应可能省略 `context` 与 `operationGuidance`。将
+   `context` 视为整个批次的必需提示级输入：阅读并考虑
+   它，并应用相关的项目事实、约定与约束。将
+   `operationGuidance` 视为可选的增量建议：阅读并考虑每一条目，遵循那些适用且与内置批次工作流兼容的条目。
+
+   将这两个字段与冲突分析、用户的显式选择、已解析路径、CLI 检查和命令契约分开对待。若 context 与其中某个控制输入冲突，报告冲突并保留控制值。若 guidance 不适用或与某个控制输入冲突，不要遵循它并解释原因。不要从任何字段推断跳过的提示、替换路径或标志，也不将它们的文本逐字复制到 specs、changes、archive 目录或输出摘要中。这些是提示级行为契约，不是可强制执行的检查。
+
+3. **批量校验 - 收集所有所选变更的状态**
+
+   用相同的已选根目录标志运行一次 `openspec-cn list --json` 以获取任务进度。
+   若查询失败、返回无效 JSON、遗漏任何所选变更、包含重复的所选变更、
+   或返回无效计数，报告问题并在同步或归档该批次之前停止。
+
+   对每个所选变更，收集：
+
+   a. **产出物状态** - 运行 `openspec-cn status --change "<name>" --json`
+      - 解析 `schemaName`、`artifacts`、`planningHome`、`changeRoot`、`artifactPaths` 和 `actionContext`
+      - 记录哪些产出物为 `done`，哪些为其他状态
+
+   b. **任务完成情况** - 从列表响应中找到 `name` 与该变更完全匹配的 `changes` 条目
+      - 要求 `totalTasks` 与 `completedTasks` 为非负整数，且 `completedTasks <= totalTasks`
+      - 未完成任务数 = `totalTasks - completedTasks`
+      - CLI 会解析 schema 追踪的任务文件，包括自定义制品名、输出路径和 glob
+      - 不要从制品状态、`tasks` 制品 ID 或顶层 `tasks.md` 的缺失推断任务完成情况
+      - CLI 只把 `x`/`X` 复选框标记计为完成；其他标记保持未完成
+      - 若 `totalTasks` 为零，记为"无任务"
+
+   c. **Delta specs** - 从状态 JSON 检查 `artifactPaths.specs.existingOutputPaths`
+      - 列出存在哪些 capability spec
+      - 对每个，提取需求名称（匹配 `### Requirement: <name>` 的行）
+      - 将此列表作为唯一的增量 spec 来源。若 `specs` 条目
+        缺失或列表为空，对该变更不执行 spec 同步或 specs-instruction 查找；不要从无关制品推断增量 spec。
+      - 对每个变更独立评估，包括某些 schema 没有 `specs` 制品的混合 schema 批次。
+
+   d. **归档目标** - 每个变更的目标名称只计算一次，并记录为该变更的 `<target-name>`
+      - 若变更名已以 `YYYY-MM-DD-` 前缀开头则原样使用；否则将当前日期前置为 `YYYY-MM-DD-<name>`（与 `openspec-cn archive` 相同的规则）
+      - 检查 `<planningHome.changesDir>/archive/<target-name>` 是否已存在
+      - 若已存在，或另一个所选变更解析出相同的目标名称，将所有这些变更标记为 `受阻`，原因为 `归档目录已存在`
+      - 受阻的变更绝不被同步或移动：在步骤 6 表格中显示为 `受阻`，将其排除在冲突解决之外（仅用其他变更来解决冲突），并在步骤 8d 中记为失败
+      - 在此处检查（任何主 spec 写入之前）与 `openspec-cn archive` 一致：同步之后才发现冲突会导致主 specs 被改写，而归档却从未发生
+
+4. **检测 spec 冲突**
+
+   构建一个以 `<capability-path>`（相对于 `specs/` 的确切路径）为键的映射：
+
+   ```text
+   identity/user-auth -> [change-a, change-b]  <- 冲突（2 个及以上变更）
+   billing/user-auth  -> [change-c]            <- 正常（完整路径不同）
+   ```
+
+   当 2 个及以上所选变更对同一个 `<capability-path>` 拥有 delta specs 时，即存在冲突。
+
+5. **主动解决冲突**
+
+   **对每个冲突**，调查代码库：
+
+   a. **阅读 delta specs** - 从每个冲突变更中理解其声称新增/修改的内容
+
+   b. **搜索代码库** 寻找实现证据：
+      - 查找实现各 delta spec 中需求的代码
+      - 检查相关文件、函数或测试
+
+   c. **确定解决方案**：
+      - 若仅一个变更实际已实现 -> 仅同步该变更的 specs
+      - 若两者都已实现 -> 按时间顺序应用（先旧后新，新者覆盖）
+      - 若两者都未实现 -> 跳过 spec 同步，警告用户
+
+   d. **记录每个冲突的解决方案**：
+      - 对每个增量 spec 的包含或排除决策，按变更和 `<capability-path>` 索引
+      - 要应用哪些包含的增量 spec 以及按什么顺序
+      - 哪些增量 spec 因实现缺失而从同步中排除
+      - 理由（在代码库中发现了什么）
+
+6. **展示汇总状态表**
+
+   展示一个汇总所有变更的表格：
+
+   ```markdown
+   | 变更               | 产出物 | 任务 | Specs   | 冲突      | 状态   |
+   |---------------------|-----------|-------|---------|-----------|--------|
+   | schema-management   | 完成      | 5/5   | 2 delta | 无        | 就绪   |
+   | project-config      | 完成      | 3/3   | 1 delta | 无        | 就绪   |
+   | add-oauth           | 完成      | 4/4   | 1 delta | identity/user-auth (!) | 就绪*  |
+   | add-verify-skill    | 剩余 1    | 2/5   | 无      | 无        | 警告   |
+   ```
+
+   对冲突，展示解决方案：
+   ```text
+   * 冲突解决：
+     - identity/user-auth spec：将先应用 add-oauth 再应用 add-jwt（两者都已实现，按时间顺序）
+   ```
+
+   对未完成的变更，展示警告：
+   ```text
+   警告：
+   - add-verify-skill：1 个未完成产出物，3 个未完成任务
+   ```
+
+7. **确认批量操作**
+
+   询问用户单个确认问题：
+
+   - "归档 N 个变更？" 选项依据状态而定
+   - 选项可能包括：
+     - "归档全部 N 个变更"
+     - "仅归档 N 个就绪变更（跳过未完成）"
+     - "取消"
+
+   若存在未完成变更，明确说明它们将带警告归档。
+
+   根据用户回答的意图路由，而不是精确匹配标签 —— 标签是你自己写的，
+   所以匹配用户选择的选项，而非上面的措辞：
+   - "取消" — 停止，不归档。报告未归档任何变更并跳过其余步骤。
+   - "归档全部"选项 — 对每个未被 `受阻` 的已选变更继续
+   - "仅就绪"选项 — 只继续步骤 6 表格中标记为 `就绪` 或 `就绪*` 的变更，其余在步骤 8d 中记为"跳过"，但 `受阻` 的变更保持为失败并附上 `归档目录已存在`。若某个 `就绪*` 变更的冲突对象被跳过，则仅基于将要归档的变更重新推导该冲突的解决方案。
+   - 其他任何回答 — 再次询问，而不是归档
+
+   在步骤 8 写入第一个主 spec 或移动任何变更之前，为已确认的批次获取所有需要的 specs 规则快照。对每个将要同步具体 `artifactPaths.specs.existingOutputPaths` 的变更，用相同的已选根目录标志运行 `openspec-cn instructions specs --change "<name>" --json` 恰好一次。在第一次写入或移动之前获取所有快照。若任何查询以非零状态退出或返回无效的制品指令 JSON，找出受影响的变更，报告错误，并在任何主 spec 写入或变更移动之前停止整个批次。不要把查询失败当作省略了规则。没有 `rules` 的有效响应就是无规则情况。
+
+8. **为每个确认的变更执行归档**
+
+   在处理之前，把步骤 5（以及步骤 7 中任何重新推导之后）记录的决策带入两个按 delta 划分的集合：
+   - `includedDeltas`：来自已确认变更中所有无冲突的增量 spec，以及为解决冲突而选入同步的增量 spec
+   - `excludedDeltas`：来自已确认变更中因实现缺失而被排除的冲突增量 spec
+   - 单个变更可以同时拥有包含和排除的增量 spec。保持按 delta 决策，不要合并为按变更的同步标志。
+
+   按确定的顺序处理各变更（遵循冲突解决方案）：
+
+   a. **同步包含的增量 spec**：
+      - 仅为有条目在 `includedDeltas` 中的变更内联运行 `openspec-sync-specs` 工作流（若已安装该 skill），否则自行内联执行 delta 到主 spec 的合并（两者都是由 agent 驱动的智能合并），仅传递包含的 delta 路径，并明确指示忽略该变更的 `excludedDeltas`。等待其完成。
+      - 若同步报告任何停止或受阻条件，视为同步失败。立即停止处理该变更。在继续下一个变更之前，在批次结果中把该变更的结果记为失败，并附上同步的受阻/错误条件。
+      - 不要执行同步后的内容比较，也不要移动其 `changeRoot`；保持该变更原样。
+      - 对冲突，按已解析的顺序应用。
+      - 把该变更已获取的 specs 规则快照传入内联同步；内联同步必须复用它，不要再次获取指令
+      - 制品规则仅应用于该变更生成的主 spec。它们不改变冲突解决方案、归档行为或 CLI 契约，其文本也不会被复制到输出文件中
+      - 不要委托给后台任务 —— 步骤 8c 会把 `changeRoot` 从一个仍在读取它的同步下方移走。
+      - 若某个变更没有包含的增量 spec，不要为它运行同步工作流。
+
+   b. **在移动 changeRoot 之前验证包含的增量 spec**：
+      - 仅针对 `includedDeltas` 中的增量 spec，与 `<planningHome.root>/openspec/specs/<capability-path>/spec.md` 处的主 spec 重新运行比较（使用步骤 3 状态 JSON 中感知 store 的 `planningHome.root`，而不是硬编码的仓库路径）。
+      - 验证主 specs 已更新：
+        - ADDED 需求存在
+        - MODIFIED 需求携带 delta 中指明的场景与描述更改，且其其他场景保持完好
+        - REMOVED 需求已消失 —— 若此次同步退役了某个能力（移除了它的最后一条需求，使 `## Requirements` 为空），其主 spec 应被删除而不是留空。
+        - RENAMED 需求以新名称存在且旧名称下已消失
+      - 不要验证 `excludedDeltas` 中的增量 spec；它们被有意保留为未同步。
+      - 若同步失败或任何能力未通过验证，报告差异并使该变更的 `changeRoot` 移动失败/跳过 —— 不要归档该变更。`changeRoot` 保持完好。
+
+   c. **执行归档**：
+
+      目标名称：使用步骤 3d 中为该变更记录的 `<target-name>`，保持不变。绝不在此重新计算：跨过午夜的批次会在步骤 3 检查一个日期，却在移动时使用另一个。
+
+      **检查目标是否已存在：**
+      - 即使步骤 3 已检查过，在移动前立即再检查一次：目标可能在批次进行中出现
+      - 是：将该变更记为失败并附上 `归档目录已存在`，保持 `changeRoot` 原位不动，报告步骤 8a 已为它同步过的主 specs，并继续处理其余变更
+      - 否：移动 `changeRoot` 到归档目录
+
+      ```bash
+      mkdir -p "<planningHome.changesDir>/archive"
+      mv "<changeRoot>" "<planningHome.changesDir>/archive/<target-name>"
+      ```
+
+      **确认移动没有嵌套：** 即使目标在检查之后才出现，`mv` 也会以 0 退出，把变更移动*到*它内部。若 `<planningHome.changesDir>/archive/<target-name>/<change-directory-name>` 现在存在（`changeRoot` 的最后一段路径），将该目录移回 `changeRoot`，并把此变更记为失败并附上 `归档目录已存在`。绝不要报告它为已归档。
+
+   d. **记录每个变更的结果**：
+      - 成功：归档成功
+      - 失败：归档或 spec 验证期间出错（记录错误）
+      - 跳过：用户选择不归档（如适用）
+      - 同步跳过：对 `excludedDeltas` 中的每个增量，报告 `sync skipped` 并附上变更、`<capability-path>` 和记录的原因。这与跳过归档不同。
+
+9. **展示汇总**
+
+   展示最终结果：
+
+   ```markdown
+   ## 批量归档完成
+
+   已归档 3 个变更：
+   - schema-management-cli -> archive/2026-01-19-schema-management-cli/
+   - project-config -> archive/2026-01-19-project-config/
+   - add-oauth -> archive/2026-01-19-add-oauth/
+
+   跳过 1 个变更：
+   - add-verify-skill（用户选择不归档未完成项）
+
+   Spec 同步汇总：
+   - 4 个增量 spec 已同步到主 specs
+   - 1 个增量 spec 同步已跳过（add-jwt，identity/user-auth：未找到实现）
+   - 1 个冲突已解决（identity/user-auth：已同步 add-oauth，已跳过 add-jwt）
+   ```
+
+   若有失败：
+   ```text
+   失败 1 个变更：
+   - some-change：归档目录已存在
+   ```
+
+**冲突解决示例**
+
+示例 1：仅一个已实现
+```text
+冲突：<planningHome.root>/openspec/specs/auth/spec.md 被以下变更触及：[add-oauth, add-jwt]
+
+检查 add-oauth：
+- Delta 新增 "OAuth Provider Integration" 需求
+- 搜索代码库... 找到 src/auth/oauth.ts 实现了 OAuth 流程
+
+检查 add-jwt：
+- Delta 新增 "JWT Token Handling" 需求
+- 搜索代码库... 未找到 JWT 实现
+
+解决方案：仅 add-oauth 已实现。将仅同步 add-oauth specs。
+```
+
+示例 2：两者都已实现
+```text
+冲突：<planningHome.root>/openspec/specs/api/spec.md 被以下变更触及：[add-rest-api, add-graphql]
+
+检查 add-rest-api（创建于 2026-01-10）：
+- Delta 新增 "REST Endpoints" 需求
+- 搜索代码库... 找到 src/api/rest.ts
+
+检查 add-graphql（创建于 2026-01-15）：
+- Delta 新增 "GraphQL Schema" 需求
+- 搜索代码库... 找到 src/api/graphql.ts
+
+解决方案：两者都已实现。将先应用 add-rest-api specs，
+再应用 add-graphql specs（按时间顺序，新者优先）。
+```
+
+**成功时输出**
+
+```markdown
+## 批量归档完成
+
+已归档 N 个变更：
+- <change-1> -> archive/<target-name-1>/
+- <change-2> -> archive/<target-name-2>/
+
+Spec 同步汇总：
+- N 个 delta spec 已同步到主 specs
+- 无冲突（或：M 个冲突已解决）
+```
+
+**部分成功时输出**
+
+```markdown
+## 批量归档完成（部分）
+
+已归档 N 个变更：
+- <change-1> -> archive/<target-name-1>/
+
+跳过 M 个变更：
+- <change-2>（用户选择不归档未完成项）
+
+失败 K 个变更：
+- <change-3>：归档目录已存在
+```
+
+**无变更时输出**
+
+```markdown
+## 无可归档的变更
+
+未找到活跃的变更。创建一个新变更即可开始。
+```
+
+**护栏**
+- 允许任意数量的变更（1+ 可以，2+ 是典型用例）
+- 始终提示选择，绝不自动选择
+- 尽早检测 spec 冲突，并通过检查代码库解决
+- 当两个变更都已实现时，按时间顺序应用 specs
+- 仅在实现缺失时跳过 spec 同步（警告用户）
+- 确认前展示每个变更的清晰状态
+- 对整个批次使用单次确认
+- 用户取消确认后绝不归档 —— 被取消的批次不归档任何内容
+- 跟踪并报告所有结果（成功/跳过/失败）
+- 移动到归档时保留 .openspec.yaml
+- 归档目录目标使用当前日期，在步骤 3d 中计算一次并在移动时复用：YYYY-MM-DD-<name>；已以 `YYYY-MM-DD-` 前缀开头的名称保持原样（绝不叠加第二个日期）
+- 若归档目标已存在，使该变更失败但继续处理其他变更
+- 在步骤 3 中检查每个归档目标（在第一次主 spec 写入之前）；目标已存在的变更绝不被同步或移动
+- 若请求同步，为每个包含增量 spec 的变更内联运行 `openspec-sync-specs` 工作流（若已安装该 skill），否则自行内联执行 delta 到主 spec 的合并（两者都是由 agent 驱动）
+- 若因未安装同步 skill 而需内联合并，请保留其保障措施。仅当变更的 `.openspec.yaml` 声明 `retire_capabilities: true`、该 spec 没有其他撰写章节、且其路径解析到真实 specs 根目录之内时，才删除其最后一条需求被 delta 移除的 spec；否则在写入前停止。合并后，用相同的已选根目录标志运行 `openspec-cn validate --specs`，并将失败视为同步失败：停止并保持 `changeRoot` 原位不动
+- 将每个 delta 的 `includedDeltas` 和 `excludedDeltas` 决策带入执行；仅同步和验证包含的 delta
+- 将每个被排除的增量报告为 `sync skipped`，但不把归档本身视为跳过
+- 绝不在 spec 同步仍在进行时归档某个变更 —— 内联运行同步，并在移动 `changeRoot` 之前验证 `<planningHome.root>/openspec/specs/<capability-path>/spec.md` 处的主 specs
+- 在 spec 检查或移动之前，为每个所选根目录一次性获取归档输入
+- 在批次的第一次主 spec 写入或移动之前获取所有需要的 specs 规则快照
+- 归档输入查询失败绝不阻塞批次；它会在没有 context 或 guidance 的情况下继续
+- specs 指令查询失败会原子性地停止整个批次
+- 没有具体 `artifactPaths.specs.existingOutputPaths` 的变更继续进行而不进行 spec 同步
+- 跨批次应用相关的运行时 context 并报告冲突
+- operation guidance 保持建议性质；考虑每一条目并解释被拒绝的建议
+- 保持运行时输入、冲突分析、CLI 派生值和制品规则彼此分离
+- 制品规则仅约束正在写入的 specs
+- 绝不把运行时输入或制品规则文本原样复制到输出文件中

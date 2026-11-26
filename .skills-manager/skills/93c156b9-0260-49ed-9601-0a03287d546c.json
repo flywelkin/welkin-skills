@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "93c156b9-0260-49ed-9601-0a03287d546c",
+  "path": "systematic-debugging-2",
+  "path_key": "systematic-debugging-2",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://github.com/jnMetaCode/superpowers-zh.git",
+    "subpath": "skills\\systematic-debugging",
+    "branch": null
+  }
+}

@@ -4,9 +4,7 @@
   "path": "receiving-code-review",
   "path_key": "receiving-code-review",
   "enabled": true,
-  "tags": [
-    "superpowers"
-  ],
+  "tags": [],
   "source": {
     "type": "git",
     "ref": "https://github.com/obra/superpowers.git",
