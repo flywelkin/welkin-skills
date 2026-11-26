@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "af8d5a5e-7ba3-49a8-b5ad-9b516ebcb8dc",
+  "path": "gstack",
+  "path_key": "gstack",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://github.com/garrytan/gstack.git",
+    "subpath": null,
+    "branch": null
+  }
+}
