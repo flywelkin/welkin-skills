@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "bd0c3d9b-85f5-489a-9f86-b8f8b0e02677",
+  "path": "receiving-code-review",
+  "path_key": "receiving-code-review",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://github.com/obra/superpowers.git",
+    "subpath": "skills\\receiving-code-review",
+    "branch": null
+  }
+}

@@ -6,8 +6,8 @@
   "enabled": true,
   "tags": [],
   "source": {
-    "type": "skillssh",
-    "ref": "obra/superpowers/brainstorming",
+    "type": "git",
+    "ref": "https://github.com/obra/superpowers.git",
     "subpath": "skills\\brainstorming",
     "branch": null
   }
