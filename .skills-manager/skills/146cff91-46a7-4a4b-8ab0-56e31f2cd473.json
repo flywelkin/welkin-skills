@@ -4,7 +4,9 @@
   "path": "diagnosing-superpowers",
   "path_key": "diagnosing-superpowers",
   "enabled": true,
-  "tags": [],
+  "tags": [
+    "superpowers"
+  ],
   "source": {
     "type": "git",
     "ref": "https://github.com/obra/superpowers.git",
