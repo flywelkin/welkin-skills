@@ -4,7 +4,9 @@
   "path": "ponytail-audit",
   "path_key": "ponytail-audit",
   "enabled": true,
-  "tags": [],
+  "tags": [
+    "ponytail"
+  ],
   "source": {
     "type": "git",
     "ref": "https://github.com/DietrichGebert/ponytail.git",

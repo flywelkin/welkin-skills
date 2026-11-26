@@ -4,7 +4,9 @@
   "path": "openspec-sync-specs",
   "path_key": "openspec-sync-specs",
   "enabled": true,
-  "tags": [],
+  "tags": [
+    "openspec"
+  ],
   "source": {
     "type": "git",
     "ref": "https://github.com/Fission-AI/OpenSpec.git",

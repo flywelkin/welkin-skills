@@ -4,7 +4,9 @@
   "path": "workflow-runner",
   "path_key": "workflow-runner",
   "enabled": true,
-  "tags": [],
+  "tags": [
+    "superpowers-zh"
+  ],
   "source": {
     "type": "git",
     "ref": "https://github.com/jnMetaCode/superpowers-zh.git",

@@ -4,7 +4,9 @@
   "path": "openspec-archive-change",
   "path_key": "openspec-archive-change",
   "enabled": true,
-  "tags": [],
+  "tags": [
+    "openspec"
+  ],
   "source": {
     "type": "git",
     "ref": "https://github.com/Fission-AI/OpenSpec.git",

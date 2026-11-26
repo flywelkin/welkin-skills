@@ -4,7 +4,9 @@
   "path": "ponytail-debt",
   "path_key": "ponytail-debt",
   "enabled": true,
-  "tags": [],
+  "tags": [
+    "ponytail"
+  ],
   "source": {
     "type": "git",
     "ref": "https://github.com/DietrichGebert/ponytail.git",

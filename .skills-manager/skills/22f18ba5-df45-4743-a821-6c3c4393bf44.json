@@ -4,7 +4,9 @@
   "path": "openspec-onboard-2",
   "path_key": "openspec-onboard-2",
   "enabled": true,
-  "tags": [],
+  "tags": [
+    "openspec -cn"
+  ],
   "source": {
     "type": "git",
     "ref": "https://github.com/studyzy/OpenSpec-cn.git",

@@ -4,7 +4,9 @@
   "path": "chinese-git-workflow",
   "path_key": "chinese-git-workflow",
   "enabled": true,
-  "tags": [],
+  "tags": [
+    "superpowers-zh"
+  ],
   "source": {
     "type": "git",
     "ref": "https://github.com/jnMetaCode/superpowers-zh.git",

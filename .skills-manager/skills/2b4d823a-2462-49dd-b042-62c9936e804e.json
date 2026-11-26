@@ -4,7 +4,9 @@
   "path": "chinese-commit-conventions",
   "path_key": "chinese-commit-conventions",
   "enabled": true,
-  "tags": [],
+  "tags": [
+    "superpowers-zh"
+  ],
   "source": {
     "type": "git",
     "ref": "https://github.com/jnMetaCode/superpowers-zh.git",

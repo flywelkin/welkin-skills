@@ -4,7 +4,9 @@
   "path": "openspec-onboard",
   "path_key": "openspec-onboard",
   "enabled": true,
-  "tags": [],
+  "tags": [
+    "openspec"
+  ],
   "source": {
     "type": "git",
     "ref": "https://github.com/Fission-AI/OpenSpec.git",

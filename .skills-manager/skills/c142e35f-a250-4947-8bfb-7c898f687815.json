@@ -4,7 +4,9 @@
   "path": "ponytail-gain",
   "path_key": "ponytail-gain",
   "enabled": true,
-  "tags": [],
+  "tags": [
+    "ponytail"
+  ],
   "source": {
     "type": "git",
     "ref": "https://github.com/DietrichGebert/ponytail.git",

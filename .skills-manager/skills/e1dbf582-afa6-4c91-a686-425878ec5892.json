@@ -4,7 +4,9 @@
   "path": "openspec-verify-change",
   "path_key": "openspec-verify-change",
   "enabled": true,
-  "tags": [],
+  "tags": [
+    "openspec"
+  ],
   "source": {
     "type": "git",
     "ref": "https://github.com/Fission-AI/OpenSpec.git",
