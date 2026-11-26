@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "b8227823-e704-48f8-956a-111d670cb693",
+  "path": "writing-skills",
+  "path_key": "writing-skills",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://github.com/obra/superpowers.git",
+    "subpath": "skills\\writing-skills",
+    "branch": null
+  }
+}

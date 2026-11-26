@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "309f4ab3-743d-4cb4-83b9-10ff1c0285f9",
+  "path": "systematic-debugging",
+  "path_key": "systematic-debugging",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "git",
+    "ref": "https://github.com/obra/superpowers.git",
+    "subpath": "skills\\systematic-debugging",
+    "branch": null
+  }
+}
